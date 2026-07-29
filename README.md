@@ -50,7 +50,7 @@ Contributions and issue reports are welcome — if a skill sends you down the wr
 
 Both are in your Kudosity dashboard under **Settings → API Settings**.
 
-Kudosity runs two APIs and they authenticate differently. That split is the single biggest source of confusion for a new integrator, which is why `kudosity-authentication` exists as its own skill rather than a paragraph repeated in each one.
+Kudosity runs two APIs and they authenticate differently. That split is the single biggest source of confusion for a new integrator, which is why `kudosity-setup` exists as its own skill rather than a paragraph repeated in each one.
 
 ## Conventions
 

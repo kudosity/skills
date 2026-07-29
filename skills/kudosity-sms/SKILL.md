@@ -53,6 +53,37 @@ curl -s -X POST "https://api.transmitmessage.com/v2/sms" \
   -d '{"message": "Your order has shipped!", "sender": "61481074185", "recipient": "61491570156"}'
 ```
 
+### Response
+
+**The SMS response is a flat object — it is not wrapped in a `data` envelope.**
+
+```json
+{
+  "id": "2d2c8fb6-e514-4f5f-9706-0672b0259218",
+  "recipient": "61478038915",
+  "recipient_country": "AU",
+  "sender": "61481074185",
+  "sender_country": "AU",
+  "message_ref": "ncc1701d",
+  "message": "Report to the ready room! Opt-out reply STOP",
+  "status": "delivered",
+  "sms_count": "1",
+  "is_gsm": true,
+  "routed_via": "",
+  "track_links": true,
+  "direction": "OUT",
+  "created_at": "2022-03-28T06:12:52.450674000Z",
+  "updated_at": "2022-03-28T06:12:52.450674000Z"
+}
+```
+
+Two things to get right:
+
+- **`sms_count` is a string, not a number** — `"1"`, not `1`. So is `total_records` on the list endpoint. Parse it before doing arithmetic, or `sms_count + 1` quietly gives you `"11"`.
+- **Envelope shape varies across the V2 API.** SMS and MMS return the object flat, as above. WhatsApp, RCS, RCS capabilities and sender registrations wrap it: `{ "data": { ... }, "request": {}, "meta": {} }`. Code written against one and reused for the other reads `undefined`. `json.data ?? json` handles both.
+
+Keep `id` — it's what webhook events match against.
+
 ## Option B: Send to a List or Multiple Numbers (V1 API)
 
 **Endpoint**: `POST https://api.transmitsms.com/send-sms.json`
