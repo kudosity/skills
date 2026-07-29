@@ -7,6 +7,7 @@ metadata:
   category: Messaging
   tags: whatsapp, templates, parameters, locale, meta-cloud-api, media-header, buttons, carousel
   related:
+    - kudosity-setup
     - kudosity-whatsapp
 ---
 
@@ -17,7 +18,7 @@ Templates are how you start a WhatsApp conversation. Outside the 24-hour service
 This skill is about getting the template payload right. The payload goes to:
 
 - **Endpoint:** `POST https://api.transmitmessage.com/v2/whatsapp/messages`
-- **Header:** `x-api-key: {KUDOSITY_API_KEY}` — from the Kudosity dashboard under **Settings → API Settings**
+- **Header:** `x-api-key: {KUDOSITY_API_KEY}` — from the Kudosity dashboard under **Developers → API Settings**
 - **Body:** `sender` (optional), `recipient` (E.164), `content_type`, `content` — the last two are what this skill covers
 
 For the full send flow, the 24-hour window rule and SMS fallback, see `kudosity-whatsapp`.

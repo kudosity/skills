@@ -7,6 +7,7 @@ metadata:
   category: Messaging
   tags: whatsapp, template, service-window, opt-in, sms-fallback, business-messaging
   related:
+    - kudosity-setup
     - kudosity-whatsapp-templates
     - kudosity-webhooks
 ---

@@ -7,6 +7,7 @@ metadata:
   category: Messaging
   tags: sms, text-message, bulk-sms, link-tracking, scheduling, delivery-receipts
   related:
+    - kudosity-setup
     - kudosity-contacts-lists
     - kudosity-webhooks
 ---
@@ -25,7 +26,7 @@ Kudosity supports two ways to send SMS depending on the use case:
 **V1 API** (list-based or multi-recipient):
 - Header: `Authorization: Basic {base64(KUDOSITY_API_KEY:KUDOSITY_API_SECRET)}`
 
-Credentials come from the Kudosity dashboard under **Settings → API Settings**. Set `KUDOSITY_API_KEY` (and `KUDOSITY_API_SECRET`, which the V1 API needs) in the environment before calling.
+Credentials come from the Kudosity dashboard under **Developers → API Settings**. Set `KUDOSITY_API_KEY` (and `KUDOSITY_API_SECRET`, which the V1 API needs) in the environment before calling.
 
 ## Option A: Send to a Single Recipient (V2 API)
 

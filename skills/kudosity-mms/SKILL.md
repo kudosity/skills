@@ -7,6 +7,7 @@ metadata:
   category: Messaging
   tags: mms, multimedia, image, video, audio, gif, rich-media
   related:
+    - kudosity-setup
     - kudosity-webhooks
 ---
 
@@ -17,7 +18,7 @@ MMS messages are sent via the Kudosity V2 API and support images, GIFs, videos, 
 ## Authentication
 
 - Header: `x-api-key: {KUDOSITY_API_KEY}`
-- Credentials come from the Kudosity dashboard under **Settings → API Settings**
+- Credentials come from the Kudosity dashboard under **Developers → API Settings**
 
 ## API Details
 

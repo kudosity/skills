@@ -7,6 +7,7 @@ metadata:
   category: Messaging
   tags: rcs, rich-messaging, sms-fallback, capability-check, agent-id, rbm
   related:
+    - kudosity-setup
     - kudosity-webhooks
 ---
 

@@ -7,6 +7,7 @@ metadata:
   category: Audience
   tags: contacts, lists, audience, opt-out, unsubscribe, bulk-import, csv
   related:
+    - kudosity-setup
     - kudosity-sms
 ---
 
@@ -20,7 +21,7 @@ All list operations use **V1 Basic Auth**:
 - Header: `Authorization: Basic {credentials}`
 - Credentials: base64 encode `{KUDOSITY_API_KEY}:{KUDOSITY_API_SECRET}`
 - The user must have `KUDOSITY_API_KEY` and `KUDOSITY_API_SECRET` environment variables set
-- Credentials come from the Kudosity dashboard under **Settings → API Settings**
+- Credentials come from the Kudosity dashboard under **Developers → API Settings**
 
 ## API Details
 

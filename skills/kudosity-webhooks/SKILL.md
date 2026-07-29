@@ -7,6 +7,7 @@ metadata:
   category: Platform
   tags: webhooks, callbacks, delivery-receipts, inbound, replies, link-hits, opt-out
   related:
+    - kudosity-setup
     - kudosity-sms
     - kudosity-rcs
     - kudosity-whatsapp
@@ -19,7 +20,7 @@ Webhooks allow users to receive HTTP POST notifications when events occur, such 
 ## Authentication
 
 - Header: `x-api-key: {KUDOSITY_API_KEY}`
-- Credentials come from the Kudosity dashboard under **Settings → API Settings**
+- Credentials come from the Kudosity dashboard under **Developers → API Settings**
 
 ## API Details
 

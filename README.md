@@ -24,6 +24,7 @@ Or clone into your agent's skills directory — `~/.claude/skills/`, `.cursor/sk
 
 | Skill | Category | What it covers |
 |---|---|---|
+| `kudosity-setup` | Getting started | Account, credentials, which API needs which, getting a sender, verifying it works |
 | `kudosity-sms` | Messaging | Single-recipient (V2) and list/bulk (V1) sends, scheduling, link tracking |
 | `kudosity-mms` | Messaging | Image, GIF, video and audio attachments |
 | `kudosity-rcs` | Messaging | RCS via agent ID, SMS fallback, capability check |
@@ -34,11 +35,11 @@ Or clone into your agent's skills directory — `~/.claude/skills/`, `.cursor/sk
 
 ### Planned
 
-`kudosity-authentication`, `kudosity-api-overview`, `kudosity-reporting`, `kudosity-numbers-keywords`, `kudosity-troubleshooting`, `kudosity-ci-alerts`.
+`kudosity-api-overview`, `kudosity-reporting`, `kudosity-numbers-keywords`, `kudosity-troubleshooting`, `kudosity-ci-alerts`.
 
 Contributions and issue reports are welcome — if a skill sends you down the wrong path, that's a bug worth filing.
 
-`kudosity-authentication` is worth writing for when auth *is* the task — the V1/V2 split, constructing the Basic header, which endpoints need the secret. It is **not** a prerequisite: every skill above carries its own auth block and works installed on its own.
+`kudosity-setup` is where someone with no account or credentials starts, and it's the one to reach for on a `401`. It is **not** a prerequisite of the others — every skill above carries its own auth block and works installed on its own.
 
 ## Credentials
 
