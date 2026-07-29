@@ -47,19 +47,55 @@ Optional parameters:
 
 ### Available Event Types
 
+Ten event types, covering every channel — not just SMS:
+
 | Event Type | Description |
 |-----------|-------------|
-| `SMS_STATUS` | SMS delivery status changes (SENT, ACCEPTED, DELIVERED, FAILED, SOFT_BOUNCE, HARD_BOUNCE, OTHER) |
+| `SMS_STATUS` | SMS delivery status changes |
 | `SMS_INBOUND` | Inbound SMS received from a recipient |
-| `MMS_STATUS` | MMS status changes (SENT, FAILED) |
+| `MMS_STATUS` | MMS status changes (currently internal statuses only — SENT, FAILED) |
 | `MMS_INBOUND` | Inbound MMS received from a recipient |
+| `WHATSAPP_STATUS` | WhatsApp message status changes |
+| `WHATSAPP_INBOUND` | Inbound WhatsApp message received from a recipient |
+| `RCS_STATUS` | RCS status changes — including `READ` |
+| `RCS_INBOUND` | Inbound RCS message received from a recipient |
 | `LINK_HIT` | Recipient clicked a tracked link |
 | `OPT_OUT` | Recipient opted out via link or STOP message |
+
+If you are sending WhatsApp or RCS, these are the event types you want — `SMS_STATUS` will not report on them.
+
+### Status Values
+
+For any status event, the nested `status.status` field carries one of:
+
+| Status | Meaning |
+|---|---|
+| `SENT` | Submitted to the carrier |
+| `ACCEPTED` | Accepted by the carrier; delivery may have been attempted, but is not confirmed |
+| `DELIVERED` | Delivered to the handset |
+| `FAILED` | Error from the carrier or handset |
+| `SOFT_BOUNCE` | Temporarily undeliverable — handset switched off, out of range |
+| `HARD_BOUNCE` | Handset disconnected |
+| `READ` | Read by the recipient — **RCS only** |
+| `OTHER` | Any other status from the carrier |
+
+`ACCEPTED` is not `DELIVERED`. Treating it as a successful delivery is a common source of over-reported success rates.
 
 ### Filter Logic
 
 - **Within a filter array** (e.g., multiple senders): conditions are combined with **OR**
 - **Between different filters** (e.g., sender AND status): conditions are combined with **AND**
+
+The same filter name reads a different part of the payload depending on the event type:
+
+| Event type | `sender` / `message_ref` are matched against |
+|---|---|
+| Status events (`SMS_STATUS`, `RCS_STATUS`, …) | the `status` payload |
+| `LINK_HIT` | `link_hit.source_message` |
+| `OPT_OUT` | `opt_out.source_message` |
+| Inbound events (`SMS_INBOUND`, …) | `sender` matches the **`recipient`** field — the address that received the inbound. `message_ref` and `campaign_id` match `last_message`, when present. |
+
+The inbound row is the one that surprises people: filtering inbound events by `sender` filters by *your* number, not the customer's.
 
 ### Example: Create a webhook for SMS delivery status and inbound messages
 
@@ -110,14 +146,16 @@ curl -s "https://api.transmitmessage.com/v2/webhook" \
     "type": "SMS",
     "id": "a51ebe4e-a412-440e-a8d9-464e68a521cc",
     "message_ref": "ncc5009d",
-    "recipient": "61435790000",
+    "recipient": "447507222200",
+    "routed_via": "447507333300",
     "sender": "61481074190",
-    "status": "DELIVERED"
+    "status": "SENT"
   }
 }
 ```
 
 ### SMS Inbound Event
+
 ```json
 {
   "event_type": "SMS_INBOUND",
@@ -127,10 +165,59 @@ curl -s "https://api.transmitmessage.com/v2/webhook" \
     "id": "alss-2way-605b31c7-d2c49104",
     "message": "Yes, I'm interested",
     "recipient": "61481074190",
-    "sender": "61435790000"
+    "routed_via": "447507333300",
+    "sender": "447507222200",
+    "last_message": {
+      "type": "SMS",
+      "id": "a51ebe4e-a412-440e-a8d9-464e68a521cc",
+      "message": "Hey, check this out!",
+      "message_ref": "ncc5009d",
+      "recipient": "447507222200",
+      "routed_via": "447507333300",
+      "sender": "61481074190"
+    }
   }
 }
 ```
+
+**`last_message` is the field that makes two-way messaging work.** On receipt of an inbound message, Kudosity looks for a message you sent to that recipient from that sender and attaches it here. Its `message_ref` is your join key back to whatever the original send belonged to — an order, a booking, a conversation thread.
+
+Route replies on `mo.last_message.message_ref`, not on the phone number. Number matching breaks the first time one contact is in two flows at once, and it breaks again when a shared number is involved.
+
+It is best-effort — if no recent outbound matches, `last_message` is absent. Handle that case rather than assuming it's always there.
+
+### Shared numbers and `routed_via`
+
+`routed_via` appears when a **shared local number** was used to deliver your message. When it's present, the number the recipient actually replied to is not your sender.
+
+Any logic that pairs an inbound message to an outbound one by comparing `sender`/`recipient` needs to account for this — which is the other reason to prefer `last_message.message_ref`.
+
+### Link Hit Event
+
+The payload nests under `link_hit`, with a running total of `hits` and the message the link was sent in:
+
+```json
+{
+  "event_type": "LINK_HIT",
+  "timestamp": "2021-07-20T23:14:04Z",
+  "link_hit": {
+    "hits": 1,
+    "url": "https://www.example.com/abc",
+    "source_message": {
+      "type": "SMS",
+      "id": "faf68308-16cd-4cf9-aef7-47342bd405be",
+      "message": "Hey, Check this out! http://clckme.info/KYhSsuIH",
+      "message_ref": "D301",
+      "recipient": "61435795809",
+      "sender": "61481074185"
+    }
+  }
+}
+```
+
+For an MMS the `source_message` additionally carries `subject` and `content_urls`.
+
+`url` is the original destination, not the shortened link. `hits` is cumulative for that tracked link — so it counts repeat clicks, and is not a unique-recipient count.
 
 ### Opt-Out Event
 ```json
@@ -151,11 +238,14 @@ curl -s "https://api.transmitmessage.com/v2/webhook" \
 }
 ```
 
+`opt_out.source` tells you how they opted out — `SMS_INBOUND` for a STOP reply, `LINK_HIT` for the opt-out link. Both are binding; don't treat the link as weaker consent withdrawal than the reply.
+
 ## Important Notes
 
 - Webhook URLs **must use HTTPS**
+- A successful create returns **`201`**, not `200`
 - The `event_type` field at the top level of the request body is **deprecated** — always use `filter.event_type` instead
-- Rate limit defaults to the system limit if set to 0 or not specified
-- Multiple status events can be triggered for a single message
-- For inbound events, the `sender` filter is applied to the `recipient` field (the number that received the inbound message)
+- Rate limit defaults to the system limit if set to 0 or not specified; max is 10,000/sec
+- **Multiple status events can be triggered for a single message**, and they are not guaranteed to arrive in order. Key on `status.id` and treat handling as idempotent — a message can go `SENT` → `DELIVERED`, and a late `SENT` must not overwrite a recorded `DELIVERED`.
+- Validation errors on this endpoint return a plain `{"error": "..."}` string, not the RFC 9457 Problem Details object the messaging endpoints use
 - Always confirm with the user which event types they need before creating the webhook

@@ -93,17 +93,44 @@ Not every handset supports RCS, and carrier delivery can fail. `sms_fallback` se
 
 **Endpoint:** `POST /v2/rcs/capabilities`
 
-Use this to segment an audience — send RCS to capable devices and plain SMS to the rest — rather than paying for a fallback on every send.
+Two required fields: `sender` — the agent ID you intend to send from — and `phone_numbers`. Capability is **per agent**, so a check that omits the sender is meaningless; a number reachable for one agent is not guaranteed reachable for another.
 
 ```bash
 curl -s -X POST "https://api.transmitmessage.com/v2/rcs/capabilities" \
   -H "x-api-key: ${KUDOSITY_API_KEY}" \
   -H "User-Agent: kudosity-skills/0.1.0" \
   -H "Content-Type: application/json" \
-  -d '{"recipients": ["61438333061", "61491570156"]}'
+  -d '{
+    "sender": "DemoSender",
+    "phone_numbers": ["61438333061", "61491570156"]
+  }'
 ```
 
-Capability is per agent *and* per device — a number capable for one agent is not guaranteed capable for another, and results go stale. Re-check rather than caching indefinitely.
+Numbers are E.164 without the leading `+`. Up to 100 per request; batches of **1–10** keep latency low enough for routing-time lookups.
+
+Results come back one per number, in request order:
+
+```json
+{ "data": { "results": [
+  { "phone_number": "61438333061", "code": "ENABLED" },
+  { "phone_number": "61491570156", "code": "UNREACHABLE" }
+] } }
+```
+
+`code` is not a boolean:
+
+| Code | Meaning |
+|---|---|
+| `ENABLED` | Can receive RCS from this sender |
+| `UNREACHABLE` | Cannot receive RCS from this sender |
+| `REJECTED_NETWORK` | Not sent — network not allowed |
+| `REJECTED_ROUTE_NOT_AVAILABLE` | No route available for that sender |
+| `REQUEST_FAILED` | External problem during the check |
+| `PROCESSING_ERROR` | Couldn't be processed — retry |
+| `INVALID_DESTINATION_ADDRESS` | Number in the wrong format |
+| `UNKNOWN` | Unknown upstream error, or a code this list doesn't cover yet |
+
+**Don't use this as a hard gate on sending.** Results are best-effort and reflect capability at the moment of the lookup. Treat `UNKNOWN` as reachable, send anyway, and let `sms_fallback` carry the ones that don't land — the fallback is what gives you a hard delivery guarantee, not this check. Capability also goes stale, so re-check rather than caching indefinitely.
 
 ## Read messages back
 
@@ -112,7 +139,9 @@ Capability is per agent *and* per device — a number capable for one agent is n
 
 ## Delivery events
 
-Register a webhook (see `kudosity-webhooks`) to receive delivery status, link hits and replies. `message_ref` is echoed in every event, so set it to something you can join on — an order ID, an invoice number.
+Register a webhook (see `kudosity-webhooks`) for the `RCS_STATUS` and `RCS_INBOUND` event types. `message_ref` is echoed in every event, so set it to something you can join on — an order ID, an invoice number.
+
+RCS reports a status SMS never will: **`READ`**. Alongside `SENT`, `DELIVERED` and `FAILED`, an `RCS_STATUS` event tells you the recipient actually opened the message. It's one of the few things RCS gives you that SMS can't, so it's worth handling rather than treating `DELIVERED` as the end of the line.
 
 ## Errors
 

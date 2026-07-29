@@ -55,6 +55,29 @@ curl -s -X POST "https://api.transmitmessage.com/v2/mms" \
   }'
 ```
 
+## Response
+
+**Flat object — not wrapped in a `data` envelope**, the same as SMS and unlike WhatsApp and RCS:
+
+```json
+{
+  "id": "6fdae71c-dad7-4c36-9734-a69693ec2318",
+  "recipient": "61435795809",
+  "sender": "61481074185",
+  "country": "AU",
+  "subject": "USS Enterprise",
+  "message": "Check out this amazing specimen.",
+  "message_ref": "ncc1701d",
+  "content_urls": ["https://example.com/product.jpg"],
+  "status": "pending",
+  "track_links": true,
+  "created_at": "2022-03-29T04:42:01.631708761Z",
+  "updated_at": "2022-03-29T04:42:01.631708761Z"
+}
+```
+
+`status` on the immediate response is the submission status — `pending` here does not mean anything went wrong. Real delivery outcomes arrive via the `MMS_STATUS` webhook.
+
 ## Supported Media
 
 | Format | Type | Media Type | Limit |

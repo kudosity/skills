@@ -102,12 +102,69 @@ What counts as a sender depends on the channel:
 | WhatsApp | A registered WhatsApp Business number, E.164. Omit it and the account's default is used. |
 | RCS | **A registered RCS agent ID — not a phone number.** Passing a number fails validation. |
 
-Senders are provisioned through the Kudosity dashboard or by talking to a Kudosity account contact. Alphanumeric sender IDs and RCS agents both need approval and are not instant — factor that into any "we'll be live tomorrow" plan.
+### Check what the account already has
+
+Don't guess — ask:
+
+```bash
+curl -s "https://api.transmitmessage.com/v2/senders/registrations" \
+  -H "x-api-key: ${KUDOSITY_API_KEY}" \
+  -H "User-Agent: kudosity-skills/0.1.0"
+```
+
+For virtual numbers on the account, V1 answers the same question:
+
+```bash
+curl -s "https://api.transmitsms.com/get-numbers.json?filter=owned" \
+  -u "${KUDOSITY_API_KEY}:${KUDOSITY_API_SECRET}"
+```
+
+### Registering a mobile number — self-service
+
+A personal mobile number can be registered and verified through the API, no dashboard required. Three calls:
+
+```bash
+# 1. Create the registration → status PENDING_APPROVAL, returns registration_id
+curl -s -X POST "https://api.transmitmessage.com/v2/senders/registrations" \
+  -H "x-api-key: ${KUDOSITY_API_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{"sender": "61412312312", "country": "AU", "type": "PERSONAL_MOBILE_NUMBER"}'
+
+# 2. Send a verification code to that number
+curl -s -X POST "https://api.transmitmessage.com/v2/senders/registrations/{registration_id}/verifications" \
+  -H "x-api-key: ${KUDOSITY_API_KEY}"
+
+# 3. Confirm the code the user received
+curl -s -X POST "https://api.transmitmessage.com/v2/senders/registrations/{registration_id}/verifications/confirmation" \
+  -H "x-api-key: ${KUDOSITY_API_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{"code": "..."}'
+```
+
+`type` only accepts `PERSONAL_MOBILE_NUMBER` here. Re-registering the same sender within 30 minutes returns `429` — that's an anti-abuse guard on the verification retry limit, not a rate limit you should retry through. Creating a new registration automatically cancels any existing `PENDING_APPROVAL` one for the same sender.
+
+To remove a sender: `DELETE /v2/senders/phone-numbers/{phone_number}`.
+
+### Alphanumeric senders and RCS agents still need approval
+
+Alphanumeric IDs are created through Kudosity's registration backoffice — read-only on this API — and RCS agents are provisioned by a Kudosity account contact. Neither is instant; factor that into any "we'll be live tomorrow" plan.
+
+You can still *poll* an alpha registration's progress. `GET /v2/senders/registrations` returns `details.alphanumeric.status` through the registry lifecycle:
+
+`NEW` → `SUBMITTED_TO_REGISTRY` → `PENDING_CUSTOMER` → `PENDING_APPROVAL` → `VERIFIED` → `READY_TO_USE`
+
+> **`VERIFIED` does not mean you can send.** It means *Provisioning*. **`READY_TO_USE` is the one that means ready.** Sending on `VERIFIED` fails, and the failure looks like a mystery rather than a sender problem.
+>
+> `PENDING_CUSTOMER` means it's waiting on **you**, not on the registry — check `status_reason` and act.
+
+This enum is expected to grow as the registry adds states, so render an unrecognised value gracefully rather than treating the list as closed.
 
 Two things worth knowing early:
 
 - **Alphanumeric senders can't receive replies.** If the use case needs two-way messaging, a number is required.
 - **RCS agents must be launched per carrier** before they deliver in a given market.
+
+On accounts with parent/child structure, all of the above takes an optional `child_account_id` to register a sender against a child rather than the parent.
 
 ## 7. Confirm and move on
 
