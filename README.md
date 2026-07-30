@@ -10,8 +10,6 @@ Skills are not an MCP server. The MCP server ([`kudosity/mcp`](https://github.co
 
 ## Install
 
-Once published:
-
 ```bash
 npx skills add kudosity/skills
 ```
@@ -48,7 +46,7 @@ Contributions and issue reports are welcome — if a skill sends you down the wr
 | `KUDOSITY_API_KEY` | Everything on the V2 API (`x-api-key` header) |
 | `KUDOSITY_API_SECRET` | V1 API only (HTTP Basic, paired with the key) — lists, contacts, reporting, balance |
 
-Both are in your Kudosity dashboard under **Settings → API Settings**.
+Both are in your Kudosity dashboard under **Developers → API Settings**.
 
 Kudosity runs two APIs and they authenticate differently. That split is the single biggest source of confusion for a new integrator, which is why `kudosity-setup` exists as its own skill rather than a paragraph repeated in each one.
 
