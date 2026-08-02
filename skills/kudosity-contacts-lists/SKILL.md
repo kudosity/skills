@@ -3,7 +3,7 @@ name: kudosity-contacts-lists
 description: "Create contact lists and manage their members on the Kudosity platform. Use when creating a contact list, adding or removing recipients, bulk-importing contacts from a CSV, opting a contact out or unsubscribing them, or preparing an audience for a bulk SMS campaign."
 metadata:
   author: Kudosity
-  version: 0.2.0
+  version: 0.2.1
   category: Audience
   tags: contacts, lists, audience, opt-out, unsubscribe, bulk-import, csv, compliance
   related:
@@ -36,7 +36,7 @@ V1 uses **HTTP Basic**, not the `x-api-key` header the V2 endpoints use:
 ```bash
 curl -s -X POST "https://api.transmitsms.com/add-list.json" \
   -u "${KUDOSITY_API_KEY}:${KUDOSITY_API_SECRET}" \
-  -H "User-Agent: kudosity-skills/0.2.0" \
+  -H "User-Agent: kudosity-skills/0.2.1" \
   -d "name=My Campaign List&field_1=email&field_2=postcode"
 ```
 
@@ -54,7 +54,7 @@ The response returns the list `id`. Keep it — everything below needs it.
 ```bash
 curl -s -X POST "https://api.transmitsms.com/add-to-list.json" \
   -u "${KUDOSITY_API_KEY}:${KUDOSITY_API_SECRET}" \
-  -H "User-Agent: kudosity-skills/0.2.0" \
+  -H "User-Agent: kudosity-skills/0.2.1" \
   -d "list_id=4213644&msisdn=0491570156&countrycode=AU&first_name=John&last_name=Doe&field_1=john@example.com"
 ```
 
@@ -82,7 +82,7 @@ Only `Mobile` is strictly required.
 ```bash
 curl -s -X POST "https://api.transmitsms.com/add-contacts-bulk.json" \
   -u "${KUDOSITY_API_KEY}:${KUDOSITY_API_SECRET}" \
-  -H "User-Agent: kudosity-skills/0.2.0" \
+  -H "User-Agent: kudosity-skills/0.2.1" \
   -d "list_id=4213644&file_url=https://example.com/contacts.csv&countrycode=AU&field_1=email"
 ```
 
@@ -131,7 +131,7 @@ curl -s -X POST "https://api.transmitsms.com/add-contacts-bulk-progress.json" \
 ```bash
 curl -s -X POST "https://api.transmitsms.com/optout-list-member.json" \
   -u "${KUDOSITY_API_KEY}:${KUDOSITY_API_SECRET}" \
-  -H "User-Agent: kudosity-skills/0.2.0" \
+  -H "User-Agent: kudosity-skills/0.2.1" \
   -d "list_id=4213644&msisdn=61491570156"
 ```
 
@@ -152,7 +152,7 @@ If you send marketing, an unsubscribe method is a legal requirement. See Kudosit
 ```bash
 curl -s -X POST "https://api.transmitsms.com/delete-from-list.json" \
   -u "${KUDOSITY_API_KEY}:${KUDOSITY_API_SECRET}" \
-  -H "User-Agent: kudosity-skills/0.2.0" \
+  -H "User-Agent: kudosity-skills/0.2.1" \
   -d "list_id=4213644&msisdn=61491570156"
 ```
 

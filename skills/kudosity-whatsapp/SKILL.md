@@ -3,7 +3,7 @@ name: kudosity-whatsapp
 description: "Send WhatsApp messages via the Kudosity platform — pre-approved templates, free-form text inside the 24-hour service window, and SMS fallback. Use when sending a WhatsApp message, deciding between a template and free-form text, handling the 24-hour window, or reading WhatsApp message status back."
 metadata:
   author: Kudosity
-  version: 0.2.0
+  version: 0.2.1
   category: Messaging
   tags: whatsapp, template, service-window, opt-in, sms-fallback, business-messaging
   related:
@@ -58,7 +58,7 @@ Optional:
 ```bash
 curl -s -X POST "https://api.transmitmessage.com/v2/whatsapp/messages" \
   -H "x-api-key: ${KUDOSITY_API_KEY}" \
-  -H "User-Agent: kudosity-skills/0.2.0" \
+  -H "User-Agent: kudosity-skills/0.2.1" \
   -H "Content-Type: application/json" \
   -d '{
     "sender": "14155238886",

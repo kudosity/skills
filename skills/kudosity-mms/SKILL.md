@@ -3,7 +3,7 @@ name: kudosity-mms
 description: "Send MMS (multimedia) messages via the Kudosity platform. Use when sending a message with an image, GIF, video, or audio attachment to a recipient."
 metadata:
   author: Kudosity
-  version: 0.2.0
+  version: 0.2.1
   category: Messaging
   tags: mms, multimedia, image, video, audio, gif, rich-media
   related:
@@ -44,7 +44,7 @@ Optional:
 ```bash
 curl -s -X POST "https://api.transmitmessage.com/v2/mms" \
   -H "x-api-key: ${KUDOSITY_API_KEY}" \
-  -H "User-Agent: kudosity-skills/0.2.0" \
+  -H "User-Agent: kudosity-skills/0.2.1" \
   -H "Content-Type: application/json" \
   -d '{
     "subject": "New Arrival",

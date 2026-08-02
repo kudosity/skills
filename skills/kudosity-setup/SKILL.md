@@ -3,7 +3,7 @@ name: kudosity-setup
 description: "Get set up with Kudosity from scratch — create an account, find your API credentials, understand which of the two APIs needs which credential, get a sender, and verify it all works before sending. Use when someone has no Kudosity account or credentials yet, when a call returns 401, or when a send fails because there is no valid sender."
 metadata:
   author: Kudosity
-  version: 0.2.0
+  version: 0.2.1
   category: Getting started
   tags: setup, onboarding, credentials, api-key, api-secret, authentication, sender, getting-started
   related:
@@ -109,7 +109,7 @@ Don't guess — ask:
 ```bash
 curl -s "https://api.transmitmessage.com/v2/senders/registrations" \
   -H "x-api-key: ${KUDOSITY_API_KEY}" \
-  -H "User-Agent: kudosity-skills/0.2.0"
+  -H "User-Agent: kudosity-skills/0.2.1"
 ```
 
 For virtual numbers on the account, V1 answers the same question:
