@@ -3,7 +3,7 @@ name: kudosity-sms
 description: "Send SMS messages via the Kudosity platform. Use when sending a text message to a single recipient or to a contact list, scheduling a send, enabling link tracking, or wiring up delivery callbacks."
 metadata:
   author: Kudosity
-  version: 0.1.0
+  version: 0.2.0
   category: Messaging
   tags: sms, text-message, bulk-sms, link-tracking, scheduling, delivery-receipts
   related:
@@ -48,7 +48,7 @@ Example curl command:
 ```bash
 curl -s -X POST "https://api.transmitmessage.com/v2/sms" \
   -H "x-api-key: ${KUDOSITY_API_KEY}" \
-  -H "User-Agent: kudosity-skills/0.1.0" \
+  -H "User-Agent: kudosity-skills/0.2.0" \
   -H "Content-Type: application/json" \
   -d '{"message": "Your order has shipped!", "sender": "61481074185", "recipient": "61491570156"}'
 ```
@@ -109,7 +109,7 @@ Example curl command (list-based):
 ```bash
 curl -s -X POST "https://api.transmitsms.com/send-sms.json" \
   -u "${KUDOSITY_API_KEY}:${KUDOSITY_API_SECRET}" \
-  -H "User-Agent: kudosity-skills/0.1.0" \
+  -H "User-Agent: kudosity-skills/0.2.0" \
   -d "message=Sale starts tomorrow!&list_id=4213644&from=61481074185"
 ```
 

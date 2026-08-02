@@ -3,7 +3,7 @@ name: kudosity-rcs
 description: "Send RCS (Rich Communication Services) messages via the Kudosity platform, with automatic SMS fallback for non-RCS devices. Use when sending an RCS message, checking whether a number can receive RCS, or configuring RCS-to-SMS fallback. RCS sends through a registered agent ID, not a phone number."
 metadata:
   author: Kudosity
-  version: 0.1.0
+  version: 0.2.0
   category: Messaging
   tags: rcs, rich-messaging, sms-fallback, capability-check, agent-id, rbm
   related:
@@ -50,7 +50,7 @@ Optional:
 ```bash
 curl -s -X POST "https://api.transmitmessage.com/v2/rcs/messages" \
   -H "x-api-key: ${KUDOSITY_API_KEY}" \
-  -H "User-Agent: kudosity-skills/0.1.0" \
+  -H "User-Agent: kudosity-skills/0.2.0" \
   -H "Content-Type: application/json" \
   -d '{
     "sender": "DemoSender",
@@ -98,7 +98,7 @@ Two required fields: `sender` — the agent ID you intend to send from — and `
 ```bash
 curl -s -X POST "https://api.transmitmessage.com/v2/rcs/capabilities" \
   -H "x-api-key: ${KUDOSITY_API_KEY}" \
-  -H "User-Agent: kudosity-skills/0.1.0" \
+  -H "User-Agent: kudosity-skills/0.2.0" \
   -H "Content-Type: application/json" \
   -d '{
     "sender": "DemoSender",

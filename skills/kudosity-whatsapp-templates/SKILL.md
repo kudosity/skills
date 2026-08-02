@@ -3,7 +3,7 @@ name: kudosity-whatsapp-templates
 description: "Use pre-approved WhatsApp templates correctly on the Kudosity platform — naming rules, positional parameters, locales, and the custom content type for media headers, buttons and anything the simple template shape can't express. Use when a template send fails validation, when a template needs an image or document, or when picking between template and custom content."
 metadata:
   author: Kudosity
-  version: 0.1.0
+  version: 0.2.0
   category: Messaging
   tags: whatsapp, templates, parameters, locale, meta-cloud-api, media-header, buttons, carousel
   related:
