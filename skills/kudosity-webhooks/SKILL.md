@@ -1,11 +1,11 @@
 ---
 name: kudosity-webhooks
-description: "Create and manage webhooks on the Kudosity platform. Use when receiving notifications for delivery status, inbound messages and replies, MMS events, link hits, or opt-outs."
+description: "Create and manage webhooks on the Kudosity platform. Use when receiving notifications for delivery status, inbound messages and replies, tapped RCS suggestions, MMS events, link hits, or opt-outs."
 metadata:
   author: Kudosity
   version: 0.2.1
   category: Platform
-  tags: webhooks, callbacks, delivery-receipts, inbound, replies, link-hits, opt-out
+  tags: webhooks, callbacks, delivery-receipts, inbound, replies, rcs-suggestions, link-hits, opt-out
   related:
     - kudosity-setup
     - kudosity-sms
@@ -58,7 +58,7 @@ Ten event types, covering every channel — not just SMS:
 | `WHATSAPP_STATUS` | WhatsApp message status changes |
 | `WHATSAPP_INBOUND` | Inbound WhatsApp message received from a recipient |
 | `RCS_STATUS` | RCS status changes — including `READ` |
-| `RCS_INBOUND` | Inbound RCS message received from a recipient |
+| `RCS_INBOUND` | Inbound RCS message received from a recipient — a text reply, a tapped suggestion, or rich content |
 | `LINK_HIT` | Recipient clicked a tracked link |
 | `OPT_OUT` | Recipient opted out via link or STOP message |
 
@@ -76,10 +76,14 @@ For any status event, the nested `status.status` field carries one of:
 | `FAILED` | Error from the carrier or handset |
 | `SOFT_BOUNCE` | Temporarily undeliverable — handset switched off, out of range |
 | `HARD_BOUNCE` | Handset disconnected |
-| `READ` | Read by the recipient — **RCS only** |
+| `REJECTED` | Rejected before delivery — by Kudosity (for example, compliance validation) or, for RCS, by the carrier or gateway (for example, a handset that can't receive RCS) |
+| `UNDELIVERABLE` | **RCS** — reached the carrier but couldn't be delivered: handset unreachable, or the message expired |
+| `READ` | Read by the recipient — **RCS and WhatsApp**; SMS and MMS never report it |
 | `OTHER` | Any other status from the carrier |
 
 `ACCEPTED` is not `DELIVERED`. Treating it as a successful delivery is a common source of over-reported success rates.
+
+For RCS, the failed statuses are `REJECTED`, `UNDELIVERABLE` and `FAILED`. The webhook is the only place you see the difference: `GET /v2/rcs/messages` collapses all three into `FAILED`.
 
 ### Filter Logic
 
@@ -191,6 +195,94 @@ It is best-effort — if no recent outbound matches, `last_message` is absent. H
 `routed_via` appears when a **shared local number** was used to deliver your message. When it's present, the number the recipient actually replied to is not your sender.
 
 Any logic that pairs an inbound message to an outbound one by comparing `sender`/`recipient` needs to account for this — which is the other reason to prefer `last_message.message_ref`.
+
+### RCS Status Event
+
+```json
+{
+  "event_type": "RCS_STATUS",
+  "timestamp": "2026-11-17T01:05:04Z",
+  "webhook_id": "67e3e4af-62e8-4515-8b67-6f20d0c51ffb",
+  "webhook_name": "RCS and SMS status",
+  "status": {
+    "type": "RCS",
+    "id": "0b8f3c2e-6d4a-4f1e-9a7b-2c5d8e1f4a63",
+    "message_ref": "order-12345",
+    "sender": "DemoSender",
+    "recipient": "61438333061",
+    "status": "DELIVERED",
+    "reason_code": "DELIVERED_TO_HANDSET"
+  }
+}
+```
+
+`status.sender` is the RCS Agent ID, not a phone number. A failed event can carry a `reason_code` such as `NOT_RCS_CAPABLE` or `EXPIRED`, or a `description`. The `description` is text for people to read — match on `status` and `reason_code`, never on `description`.
+
+### RCS with an SMS fallback: one message, two event types
+
+An RCS message sent with `sms_fallback` reports on two channels. When the RCS leg fails, the fallback SMS reports through `SMS_STATUS` — with the **same `id` and `message_ref`** as the RCS message, and the SMS sender in `status.sender`.
+
+Subscribe one webhook to both, or you will see the RCS failure and never learn that the SMS arrived:
+
+```bash
+curl -s -X POST "https://api.transmitmessage.com/v2/webhook" \
+  -H "x-api-key: ${KUDOSITY_API_KEY}" \
+  -H "User-Agent: kudosity-skills/0.2.1" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "RCS and SMS status",
+    "url": "https://myapp.com/webhooks/kudosity",
+    "filter": {"event_type": ["RCS_STATUS", "SMS_STATUS"]}
+  }'
+```
+
+Match on `status.id`, then read `status.type` and `status.status` together: `RCS` + `DELIVERED`/`READ` means it arrived as RCS; `SMS` + `DELIVERED` means it arrived as the fallback. A failed `RCS_STATUS` with no `SMS_STATUS` to follow means the fallback wasn't sent — most often because the send had no `sms_fallback.sender`. See `kudosity-rcs` for the full table.
+
+### RCS Inbound Event
+
+`RCS_INBOUND` fires when a recipient replies in an RCS conversation: free text, a tap on a suggested reply or action, or rich content. `mo.content_type` says which — `TEXT`, `SUGGESTION`, `IMAGE`, `VIDEO`, `AUDIO`, `FILE`, `LOCATION` or `CONTACT` — and the matching content is nested under `mo.content`. Unlike `SMS_INBOUND`, there is no flat `mo.message` field.
+
+A free-text reply:
+
+```json
+{
+  "event_type": "RCS_INBOUND",
+  "timestamp": "2026-11-12T01:34:51.246802Z",
+  "webhook_id": "fd0e6485-b905-44c1-bd55-fee1d0d6d864",
+  "webhook_name": "RCS Inbound Webhook",
+  "mo": {
+    "type": "RCS",
+    "id": "bc2e0a4a-7e21-49de-9912-20cb4148c21f",
+    "sender": "61438333061",
+    "recipient": "DemoSender",
+    "content_type": "TEXT",
+    "content": { "text": { "message": "Yes, that time works for me." } }
+  }
+}
+```
+
+A tapped suggestion:
+
+```json
+{
+  "event_type": "RCS_INBOUND",
+  "timestamp": "2026-11-12T01:35:20.246802Z",
+  "webhook_id": "fd0e6485-b905-44c1-bd55-fee1d0d6d864",
+  "webhook_name": "RCS Inbound Webhook",
+  "mo": {
+    "type": "RCS",
+    "id": "5d1c7a90-3f6e-4b0a-8f27-91c4e2a6b7d3",
+    "sender": "61438333061",
+    "recipient": "DemoSender",
+    "content_type": "SUGGESTION",
+    "content": { "suggestion": { "text": "Yes", "postback_data": "appt-789-yes" } }
+  }
+}
+```
+
+`mo.sender` is the person who replied; `mo.recipient` is your RCS agent. `suggestion.text` is the label they tapped, and `suggestion.postback_data` is the value you set on that suggestion when you sent the message.
+
+**Route taps on `postback_data`, not on the label.** Labels get reworded and repeat across messages ("Yes" on every confirmation you send); `postback_data` is yours, so make it carry the record and the choice — `appt-789-yes`. If the send left it out, Kudosity fills in a value that means nothing to your application. Branch on `mo.content_type` first: a handler that reads `content.text.message` on every `RCS_INBOUND` breaks on the first tap.
 
 ### Link Hit Event
 

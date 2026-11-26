@@ -25,11 +25,11 @@ Or clone into your agent's skills directory — `~/.claude/skills/`, `.cursor/sk
 | `kudosity-setup` | Getting started | Account, credentials, which API needs which, getting a sender, verifying it works |
 | `kudosity-sms` | Messaging | Single-recipient (V2) and list/bulk (V1) sends, scheduling, link tracking |
 | `kudosity-mms` | Messaging | Image, GIF, video and audio attachments |
-| `kudosity-rcs` | Messaging | RCS via agent ID, SMS fallback, capability check |
+| `kudosity-rcs` | Messaging | Text, media, rich cards and carousels via agent ID; suggested replies and buttons; SMS fallback; capability check |
 | `kudosity-whatsapp` | Messaging | Templates, the 24-hour service window, opt-in, SMS fallback |
 | `kudosity-whatsapp-templates` | Messaging | Naming, positional parameters, locales, media/buttons via `custom` |
 | `kudosity-contacts-lists` | Audience | Lists, members, opt-outs, bulk CSV import |
-| `kudosity-webhooks` | Platform | Delivery status, inbound replies, link hits, opt-outs |
+| `kudosity-webhooks` | Platform | Delivery status, inbound replies, tapped RCS suggestions, link hits, opt-outs |
 
 ### Planned
 
