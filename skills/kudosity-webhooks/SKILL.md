@@ -3,7 +3,7 @@ name: kudosity-webhooks
 description: "Create and manage webhooks on the Kudosity platform. Use when receiving notifications for delivery status, inbound messages and replies, tapped RCS suggestions, MMS events, link hits, or opt-outs."
 metadata:
   author: Kudosity
-  version: 0.2.1
+  version: 0.3.0
   category: Platform
   tags: webhooks, callbacks, delivery-receipts, inbound, replies, rcs-suggestions, link-hits, opt-out
   related:
@@ -106,7 +106,7 @@ The inbound row is the one that surprises people: filtering inbound events by `s
 ```bash
 curl -s -X POST "https://api.transmitmessage.com/v2/webhook" \
   -H "x-api-key: ${KUDOSITY_API_KEY}" \
-  -H "User-Agent: kudosity-skills/0.2.1" \
+  -H "User-Agent: kudosity-skills/0.3.0" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "SMS Events",
@@ -120,7 +120,7 @@ curl -s -X POST "https://api.transmitmessage.com/v2/webhook" \
 ```bash
 curl -s -X POST "https://api.transmitmessage.com/v2/webhook" \
   -H "x-api-key: ${KUDOSITY_API_KEY}" \
-  -H "User-Agent: kudosity-skills/0.2.1" \
+  -H "User-Agent: kudosity-skills/0.3.0" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Failed SMS Alerts",
@@ -136,7 +136,7 @@ curl -s -X POST "https://api.transmitmessage.com/v2/webhook" \
 ```bash
 curl -s "https://api.transmitmessage.com/v2/webhook" \
   -H "x-api-key: ${KUDOSITY_API_KEY}" \
-  -H "User-Agent: kudosity-skills/0.2.1"
+  -H "User-Agent: kudosity-skills/0.3.0"
 ```
 
 ## Webhook Payload Examples
@@ -227,7 +227,7 @@ Subscribe one webhook to both, or you will see the RCS failure and never learn t
 ```bash
 curl -s -X POST "https://api.transmitmessage.com/v2/webhook" \
   -H "x-api-key: ${KUDOSITY_API_KEY}" \
-  -H "User-Agent: kudosity-skills/0.2.1" \
+  -H "User-Agent: kudosity-skills/0.3.0" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "RCS and SMS status",

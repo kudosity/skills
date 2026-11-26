@@ -3,7 +3,7 @@ name: kudosity-rcs
 description: "Send RCS (Rich Communication Services) messages via the Kudosity platform: text, images and video, rich cards, carousels, and suggested reply, link and call buttons, with SMS fallback for non-RCS devices. Use when sending an RCS message, building a rich card or carousel, adding buttons or quick replies, handling a tapped suggestion, checking whether a number can receive RCS, or setting up and tracking RCS-to-SMS fallback. RCS sends through an RCS agent ID, not a phone number."
 metadata:
   author: Kudosity
-  version: 0.2.1
+  version: 0.3.0
   category: Messaging
   tags: rcs, rich-messaging, rich-card, carousel, suggestions, sms-fallback, capability-check, agent-id, rbm
   related:
@@ -65,7 +65,7 @@ Text carries up to 3072 characters, full UTF-8 and emoji. A message of up to 160
 ```bash
 curl -s -X POST "https://api.transmitmessage.com/v2/rcs/messages" \
   -H "x-api-key: ${KUDOSITY_API_KEY}" \
-  -H "User-Agent: kudosity-skills/0.2.1" \
+  -H "User-Agent: kudosity-skills/0.3.0" \
   -H "Content-Type: application/json" \
   -d '{
     "sender": "DemoSender",
@@ -319,7 +319,7 @@ Two required fields: `sender` — the Agent ID you intend to send from — and `
 ```bash
 curl -s -X POST "https://api.transmitmessage.com/v2/rcs/capabilities" \
   -H "x-api-key: ${KUDOSITY_API_KEY}" \
-  -H "User-Agent: kudosity-skills/0.2.1" \
+  -H "User-Agent: kudosity-skills/0.3.0" \
   -H "Content-Type: application/json" \
   -d '{
     "sender": "DemoSender",
