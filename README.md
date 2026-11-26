@@ -29,7 +29,7 @@ Or clone into your agent's skills directory — `~/.claude/skills/`, `.cursor/sk
 | `kudosity-whatsapp` | Messaging | Templates, the 24-hour service window, opt-in, SMS fallback |
 | `kudosity-whatsapp-templates` | Messaging | Naming, positional parameters, locales, media/buttons via `custom` |
 | `kudosity-contacts-lists` | Audience | Lists, members, opt-outs, bulk CSV import |
-| `kudosity-webhooks` | Platform | Delivery status, inbound replies, tapped RCS suggestions, link hits, opt-outs |
+| `kudosity-webhooks` | Platform | Delivery status, inbound replies, tapped RCS suggestions, link hits, opt-outs; payment and sender events |
 
 ### Planned
 
