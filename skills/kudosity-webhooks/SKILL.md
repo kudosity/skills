@@ -47,7 +47,7 @@ Optional parameters:
 
 ### Available Event Types
 
-Ten event types, covering every channel — not just SMS:
+Fourteen event types. Ten report on messages, covering every channel — not just SMS:
 
 | Event Type | Description |
 |-----------|-------------|
@@ -63,6 +63,19 @@ Ten event types, covering every channel — not just SMS:
 | `OPT_OUT` | Recipient opted out via link or STOP message |
 
 If you are sending WhatsApp or RCS, these are the event types you want — `SMS_STATUS` will not report on them.
+
+Four more report on the account, not on messages:
+
+| Event Type | Description |
+|-----------|-------------|
+| `PAYMENT_SUCCEEDED` | A payment charged to the account succeeded, such as a credit top-up |
+| `PAYMENT_FAILED` | A payment charged to the account was declined or otherwise failed |
+| `SENDER_REGISTRATION_STATUS` | A sender registration was created, or its `status` changed. Carries only `registration_id`, `type`, `sender` and the new `status` — call `GET /v2/senders/registrations` for the rest |
+| `SENDER_COMPLIANCE_STATUS` | A sender's `compliance.status` changed, or the sender got or lost a compliance verdict. Carries only `sender_id`, `sender`, `registry` and the new `status` — call `GET /v2/senders/{id}` for the rest |
+
+**These four are opt-in.** They are only delivered to a webhook whose `filter.event_type` names them. A webhook with no `event_type` filter receives all ten message event types and none of these.
+
+For the two sender events, the `sender` filter applies to the event's `sender`. They have no message status, `message_ref` or `campaign_id`, so a webhook that sets any of those filters receives no sender events — give them a webhook of their own.
 
 ### Status Values
 

@@ -121,7 +121,7 @@ curl -s "https://api.transmitsms.com/get-numbers.json?filter=owned" \
 
 ### Getting a new sender
 
-Senders are provisioned through the Kudosity dashboard or by talking to a Kudosity account contact. Alphanumeric sender IDs and RCS agents both need approval and are not instant — factor that into any "we'll be live tomorrow" plan.
+Numbers and alphanumeric sender IDs are provisioned through the Kudosity dashboard or by talking to a Kudosity account contact. An RCS agent you create, test and launch yourself in the Kudosity app under **RCS → RCS Agents**; until it is launched, it can message its test devices only. Alphanumeric sender IDs and RCS agent launches both need approval and are not instant — factor that into any "we'll be live tomorrow" plan.
 
 ### Is my sender ready to send?
 
